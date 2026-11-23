@@ -1,0 +1,473 @@
+[
+    {
+        "id": "81836be24ab952ff",
+        "type": "tab",
+        "label": "01 · MAIN ORCHESTRATOR",
+        "disabled": false,
+        "info": "01 · MAIN ORCHESTRATOR · Industrial IoT Gateway v1.3"
+    },
+    {
+        "id": "e53cfbee250c5b4c",
+        "type": "link in",
+        "z": "81836be24ab952ff",
+        "name": "BUS · solicitudes HMI",
+        "links": [],
+        "x": 150,
+        "y": 120,
+        "wires": [
+            [
+                "ddcff1da6f1456e0"
+            ]
+        ]
+    },
+    {
+        "id": "ddcff1da6f1456e0",
+        "type": "switch",
+        "z": "81836be24ab952ff",
+        "name": "Enrutador por msg.topic",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "plc.snapshot.get",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "platform.ops.get",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ai.chat",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "sqlite.metrics.get",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "alarms.list",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "reports.summary",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 420,
+        "y": 120,
+        "wires": [
+            [
+                "e0530dff2d7e5209"
+            ]
+        ]
+    },
+    {
+        "id": "e0530dff2d7e5209",
+        "type": "link call",
+        "z": "81836be24ab952ff",
+        "name": "CALL → PLC",
+        "links": [
+            "3a13599b8785552e"
+        ],
+        "linkType": "static",
+        "timeout": "45",
+        "x": 700,
+        "y": 80,
+        "wires": [
+            [
+                "198974b95351508d"
+            ]
+        ]
+    },
+    {
+        "id": "198974b95351508d",
+        "type": "function",
+        "z": "81836be24ab952ff",
+        "name": "Normalizar respuesta plc",
+        "func": "const body=msg.payload;\nmsg.payload={kind:'response',request_id:msg.request_id||msg._msgid||'unknown',topic:msg._request_topic||msg.topic,status:(msg.statusCode>=400)?'error':'ok',received_at:new Date().toISOString(),data:body};\nmsg.topic='gateway.response';return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 80,
+        "wires": [
+            [
+                "ac91d3238f61537d"
+            ]
+        ]
+    },
+    {
+        "id": "f2cb06c48da7510a",
+        "type": "link call",
+        "z": "81836be24ab952ff",
+        "name": "CALL → FASTAPI",
+        "links": [
+            "f9fad760eafe5047"
+        ],
+        "linkType": "static",
+        "timeout": "45",
+        "x": 700,
+        "y": 150,
+        "wires": [
+            [
+                "4ad9311a4a9157c7"
+            ]
+        ]
+    },
+    {
+        "id": "4ad9311a4a9157c7",
+        "type": "function",
+        "z": "81836be24ab952ff",
+        "name": "Normalizar respuesta fastapi",
+        "func": "const body=msg.payload;\nmsg.payload={kind:'response',request_id:msg.request_id||msg._msgid||'unknown',topic:msg._request_topic||msg.topic,status:(msg.statusCode>=400)?'error':'ok',received_at:new Date().toISOString(),data:body};\nmsg.topic='gateway.response';return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 150,
+        "wires": [
+            [
+                "ac91d3238f61537d"
+            ]
+        ]
+    },
+    {
+        "id": "fb557dafcb86537c",
+        "type": "link call",
+        "z": "81836be24ab952ff",
+        "name": "CALL → OPENAI",
+        "links": [
+            "26612278c1505b16"
+        ],
+        "linkType": "static",
+        "timeout": "45",
+        "x": 700,
+        "y": 220,
+        "wires": [
+            [
+                "399f2c21d9ef5599"
+            ]
+        ]
+    },
+    {
+        "id": "399f2c21d9ef5599",
+        "type": "function",
+        "z": "81836be24ab952ff",
+        "name": "Normalizar respuesta openai",
+        "func": "const body=msg.payload;\nmsg.payload={kind:'response',request_id:msg.request_id||msg._msgid||'unknown',topic:msg._request_topic||msg.topic,status:(msg.statusCode>=400)?'error':'ok',received_at:new Date().toISOString(),data:body};\nmsg.topic='gateway.response';return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 220,
+        "wires": [
+            [
+                "ac91d3238f61537d"
+            ]
+        ]
+    },
+    {
+        "id": "83285b00c43d566e",
+        "type": "link call",
+        "z": "81836be24ab952ff",
+        "name": "CALL → SQLITE",
+        "links": [
+            "2b221a4016575e5c"
+        ],
+        "linkType": "static",
+        "timeout": "45",
+        "x": 700,
+        "y": 290,
+        "wires": [
+            [
+                "da775f6e64d657a2"
+            ]
+        ]
+    },
+    {
+        "id": "da775f6e64d657a2",
+        "type": "function",
+        "z": "81836be24ab952ff",
+        "name": "Normalizar respuesta sqlite",
+        "func": "const body=msg.payload;\nmsg.payload={kind:'response',request_id:msg.request_id||msg._msgid||'unknown',topic:msg._request_topic||msg.topic,status:(msg.statusCode>=400)?'error':'ok',received_at:new Date().toISOString(),data:body};\nmsg.topic='gateway.response';return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 290,
+        "wires": [
+            [
+                "ac91d3238f61537d"
+            ]
+        ]
+    },
+    {
+        "id": "d98d50340af65231",
+        "type": "link call",
+        "z": "81836be24ab952ff",
+        "name": "CALL → ALARMS",
+        "links": [
+            "81209855d90a5017"
+        ],
+        "linkType": "static",
+        "timeout": "45",
+        "x": 700,
+        "y": 360,
+        "wires": [
+            [
+                "fd9fe4db9f805385"
+            ]
+        ]
+    },
+    {
+        "id": "fd9fe4db9f805385",
+        "type": "function",
+        "z": "81836be24ab952ff",
+        "name": "Normalizar respuesta alarms",
+        "func": "const body=msg.payload;\nmsg.payload={kind:'response',request_id:msg.request_id||msg._msgid||'unknown',topic:msg._request_topic||msg.topic,status:(msg.statusCode>=400)?'error':'ok',received_at:new Date().toISOString(),data:body};\nmsg.topic='gateway.response';return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 360,
+        "wires": [
+            [
+                "ac91d3238f61537d"
+            ]
+        ]
+    },
+    {
+        "id": "12308f1812e2515a",
+        "type": "link call",
+        "z": "81836be24ab952ff",
+        "name": "CALL → REPORTS",
+        "links": [
+            "eb47c766d25f57e4"
+        ],
+        "linkType": "static",
+        "timeout": "45",
+        "x": 700,
+        "y": 430,
+        "wires": [
+            [
+                "9d52f9857a455fdc"
+            ]
+        ]
+    },
+    {
+        "id": "9d52f9857a455fdc",
+        "type": "function",
+        "z": "81836be24ab952ff",
+        "name": "Normalizar respuesta reports",
+        "func": "const body=msg.payload;\nmsg.payload={kind:'response',request_id:msg.request_id||msg._msgid||'unknown',topic:msg._request_topic||msg.topic,status:(msg.statusCode>=400)?'error':'ok',received_at:new Date().toISOString(),data:body};\nmsg.topic='gateway.response';return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 430,
+        "wires": [
+            [
+                "ac91d3238f61537d"
+            ]
+        ]
+    },
+    {
+        "id": "b3a7bab877da5bc9",
+        "type": "function",
+        "z": "81836be24ab952ff",
+        "name": "Topic no reconocido",
+        "func": "msg.error={message:'msg.topic no reconocido',source:'FLOW_MAIN',code:'UNKNOWN_TOPIC'};return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 600,
+        "wires": [
+            [
+                "9b5b952219d953b7"
+            ]
+        ]
+    },
+    {
+        "id": "ac91d3238f61537d",
+        "type": "link out",
+        "z": "81836be24ab952ff",
+        "name": "BUS → Dashboard (respuestas)",
+        "mode": "link",
+        "links": [
+            "7451f79b62f2520e"
+        ],
+        "x": 1200,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "1c084386044b52fc",
+        "type": "link in",
+        "z": "81836be24ab952ff",
+        "name": "BUS · eventos FastAPI",
+        "links": [],
+        "x": 150,
+        "y": 120,
+        "wires": [
+            [
+                "e30856414dee5906"
+            ]
+        ]
+    },
+    {
+        "id": "e30856414dee5906",
+        "type": "function",
+        "z": "81836be24ab952ff",
+        "name": "Validar WS y normalizar evento",
+        "func": "let e=msg.payload;if(typeof e==='string'){try{e=JSON.parse(e)}catch(err){msg.error={message:'Evento WS no es JSON',source:'WS'};return [null,msg]}}const key=env.get('INTERNAL_API_KEY');if(!e||!key||e.api_key!==key){node.warn('WS rechazado: API Key inválida');return null;}delete e.api_key;msg.payload=e;msg.request_id=e.request_id||('evt-'+Date.now()+'-'+Math.random().toString(36).slice(2,8));msg.topic='event.'+(e.type||'unknown');msg.received_at=new Date().toISOString();return msg;",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 700,
+        "wires": [
+            [
+                "ceb5e24a381e5d35"
+            ],
+            [
+                "9b5b952219d953b7"
+            ]
+        ]
+    },
+    {
+        "id": "ceb5e24a381e5d35",
+        "type": "link out",
+        "z": "81836be24ab952ff",
+        "name": "BUS EVENTOS · fanout",
+        "mode": "link",
+        "links": [
+            "1f2789500c3b501c",
+            "772a73b35428516e",
+            "761ccc7dccef5b1b"
+        ],
+        "x": 1200,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "742ece2573b15e2d",
+        "type": "link in",
+        "z": "81836be24ab952ff",
+        "name": "BUS · errores centralizados",
+        "links": [],
+        "x": 150,
+        "y": 120,
+        "wires": [
+            [
+                "ecbfefeeb8ac5b44"
+            ]
+        ]
+    },
+    {
+        "id": "ecbfefeeb8ac5b44",
+        "type": "function",
+        "z": "81836be24ab952ff",
+        "name": "Gestor central de errores",
+        "func": "const e=msg.error||msg.payload||{};msg.payload={kind:'error',request_id:msg.request_id||msg._msgid||'unknown',source:e.source||'Node-RED',code:e.code||e.name||'FLOW_ERROR',message:String(e.message||e).slice(0,500),timestamp:new Date().toISOString()};msg.topic='gateway.error';return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 850,
+        "wires": [
+            [
+                "9b5b952219d953b7"
+            ]
+        ]
+    },
+    {
+        "id": "9b5b952219d953b7",
+        "type": "link out",
+        "z": "81836be24ab952ff",
+        "name": "BUS ERRORES → HMI",
+        "mode": "link",
+        "links": [
+            "1f2789500c3b501c"
+        ],
+        "x": 1200,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "9f6421ce26ea5c98",
+        "type": "catch",
+        "z": "81836be24ab952ff",
+        "name": "Errores del orquestador",
+        "scope": null,
+        "uncaught": false,
+        "x": 1000,
+        "y": 850,
+        "wires": [
+            [
+                "9b5b952219d953b7"
+            ]
+        ]
+    },
+    {
+        "id": "5571d4a4e4ba5953",
+        "type": "websocket in",
+        "z": "81836be24ab952ff",
+        "name": "FastAPI → WebSocket",
+        "server": "4b20ff4b42915dd2",
+        "client": "",
+        "x": 150,
+        "y": 950,
+        "wires": [
+            [
+                "1c084386044b52fc"
+            ]
+        ]
+    },
+    {
+        "id": "24f8f171134d5919",
+        "type": "comment",
+        "z": "81836be24ab952ff",
+        "name": "Contrato del bus y límites de seguridad",
+        "info": "Envelope: msg.topic + msg.request_id + msg.payload + msg.meta. Topics: plc.snapshot.get, platform.ops.get, ai.chat, sqlite.metrics.get, alarms.list, reports.summary. FastAPI es propietario de la sesión S7 y SQLite. OPENAI_API_KEY solo reside en FastAPI. X-API-Key se utiliza en cabecera de backend. El LLM es de solo lectura.",
+        "x": 400,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "4b20ff4b42915dd2",
+        "type": "websocket-listener",
+        "path": "/industrial/events",
+        "wholemsg": "false"
+    }
+]
